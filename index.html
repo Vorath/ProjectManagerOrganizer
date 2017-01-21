@@ -1,0 +1,668 @@
+    <!--Project Manager Organizer that helps Project Managers organize and keep track of information pertaining to packing up and moving in a client.
+    Copyright (C) 2017 Joshua Loeffler
+
+	This file is part of Project Manager Organizer
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Affero General Public License as published
+    by the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Affero General Public License for more details.
+
+    You should have received a copy of the GNU Affero General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
+
+<!DOCTYPE html>
+<html>
+	<head>
+		<link type="text/css" rel="stylesheet" href="stylesheet(V5).css"/>
+		<link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>Project Manager Organizer</title>
+	</head>
+	<body>
+		<div id="wrapper">
+			<ul class="topnav" id="myTopnav">
+  				<li><label id="refreshBtn">Home</label></li>
+  				<li><label id="calcHoursMenuBtn">Minutes-To-Hours Calculator</label></li>
+  				<li><label id="helpBtn">Help</label></li>
+  				<li><label id="contactBtn">Contact</label></li>
+  				<li class="icon">
+    				<label class="icon" onclick="navAdjust()">&#9776;</a></label>
+  				</li>
+			</ul>
+
+			<h2>Project Manager Organizer</h2>
+
+		<div id="calcHoursModal" class="modal">
+ 		<!-- Modal content -->
+  		<div class="modal-content">
+    		<span class="close">&times;</span>
+		<h3>Minutes-To-Hours Calculator</h3>
+        <label>Hours</label>
+        <input type = "number" id = "calcHours" />
+        <label>Minutes</label>
+        <input type = "number" id = "calcMinutes" min ="0" max="60"/>
+        <button id="calculateHoursButton" type="submit" onclick="calculateHours();"> Calculate</button>
+        <p id="convertedHours"></p>
+  		</div>
+		</div>
+
+		<!-- The Modal -->
+	<div id="modalHelp" class="modal">
+ 		<!-- Modal content -->
+  		<div class="modal-content">
+    		<span class="close">&times;</span>
+		<h3>Help</h3>
+        <ul class="helpList">
+        	<li>To begin, enter in the number of workers as well as the estimated costs for each part of the job (Enter the the highest estimate for the most accurate results)</li>
+        	<li>Upon pressing the calculate button, the screen will display the maximum hours per worker that can be spent on any given part of the job</li>
+        	<li>Towards the bottom of the screen you will also notice that the total estimated hours that can be spent on the job in order to stay under/on budget as well as the estimated cost are displayed</li>
+        	<li>At this point you can begin entering in the number of hours that were actually worked for each part of the job as they are known.</li>
+        		<ul>
+        			<li>When it asks for the "highest hours", this is referring to the highest amount of hours worked by any one worker on that part of the job</li>
+        			<ul>
+        				<li>This information is used to update the suggested amount of hours for the next part of the job</li>
+        			</ul>
+        			<li>When inputting data for the prepack, pack, and unpack, enter the data in terms of how many people did "x" hours of work (Press update and then change your inputs to submit again)</li>
+        		</ul>
+        	<li>As you update the amount of hours that were used for each part of the job, the middle column at the top of the page will display the suggested amount of hours per worker that would need to be done at the maximum in order to get back on budget</li>
+
+        	<li>Once you have pressed the update button for the unpack section, the bottom-most line under the input will display whether you have gone under or over the original estimate, and by how much you have done so</li>
+        		<ul>
+        			<li>Do not worry if you have to input multiple variations of hours for the unpack because when you hit the update button to submit your new data, the amount by which you have gone under or over the original estimate will update as well</li>
+        		</ul>
+        </ul>
+  		</div>
+	</div>
+
+		<div id="modalContact" class="modal">
+ 		<!-- Modal content -->
+  		<div class="modal-content">
+    		<span class="close">&times;</span>
+		<h3>Contact Me</h3>
+        <p>If you believe part of the website is not working properly, have any questions, or have suggestions on improving the website, feel free to click <a href="mailto:joshualoeffler7@gmail.com?Subject=Project%20Manager%20Organizer" target="_top">here</a> to email me.</p>
+  		</div>
+		</div>
+
+		<div id="input">
+		<p>
+          		<label>Hourly Rate: $</label>
+          		<input type = "number" id = "rate" name = "hourlyRate" >
+        </p>
+
+		<p>
+          		<label>Number of Pre-Packers:</label>
+          		<input type = "number" id = "numPrePackers" />
+        </p>
+
+		<p>
+          		<label>Number of Packers:</label>
+          		<input type = "number" id = "numPackers" />
+        </p>
+
+		<p>
+          		<label>Number of Unpackers:</label>
+          		<input type = "number" id = "numUnpackers" />
+        </p>
+
+		<p>
+          		<label>Walkthrough Estimate: $</label>
+          		<input type = "number" id = "estWalkthrough" />
+        </p>
+
+		<p>
+          		<label>Pre-Pack Estimate: $</label>
+          		<input type = "number" id = "estPrePack" />
+        </p>
+
+		<p>
+          		<label>Pack Estimate: $</label>
+          		<input type = "number" id = "estPack" />
+        </p>
+
+		<p>
+          		<label>Morning Move Estimate: $</label>
+          		<input type = "number" id = "estMorningMove" />
+        </p>
+
+		<p>
+          		<label>Unpack Estimate: $</label>
+          		<input type = "number" id = "estUnpack" />
+        	</p>
+		<button id="calculateButton" type="submit" onclick="calculateTimes();"> Calculate</button>
+		</div>
+
+	<div class="options">	
+		<ul class="tab">
+  		<li><a href="javascript:void(0)" id="estimatedTimesTab" class="tablinks" onclick="openTimes(event, 'estimatedTimes')">Estimated Times</a></li>
+  		<li><a href="javascript:void(0)" class="tablinks" onclick="openTimes(event, 'suggestedTimes')">Suggested Times</a></li>
+  		<li><a href="javascript:void(0)" class="tablinks" onclick="openTimes(event, 'actualTimes')">Actual Times</a></li>
+		</ul>
+	</div>
+		<div id="estimatedTimes" class="tabcontent">
+  		<h3>Estimated Times</h3>
+		<p class="walkthrough">
+          		<label>Estimated Time for Walkthrough: <span id="timeWalkthrough">________</span> hours</label>
+        	</p>
+
+		<p class="prepack">
+          		<label>Estimated Time for Pre-Pack: <span id="timePrePack">________</span> hours</label>
+        	</p>
+
+		<p class="pack">
+          		<label>Estimated Time for Pack: <span id="timePack">________</span> hours</label>
+        	</p>
+
+		<p class="morningmove">
+          		<label>Estimated Time for Morning Move: <span id="timeMorningMove">________</span> hours</label>
+        	</p>
+
+		<p class="unpack">
+          		<label> Estimated Time for Unpack: <span id="timeUnpack">________</span> hours</label>
+        	</p>
+		</div>
+		
+		<div id="suggestedTimes" class="tabcontent">
+  		<h3>Suggested Times</h3>
+		<p class="prepack">
+			<label>Suggested Time for Pre-Pack: <span id="suggestPrePackTime">___</span> hours</label>
+		</p>
+		<p class="pack">
+			<label>Suggested Time for Pack: <span id="suggestPackTime">___</span> hours</label>
+		</p>
+		<p class="morningmove">
+			<label>Suggested Time for Morning Move: <span id="suggestMorningMoveTime">___</span> hours</label>
+		</p>
+		<p class="unpack">
+			<label>Suggested Time for Unpack: <span id="suggestUnpackTime">___</span> hours</label>
+		</p>
+		</div> 
+
+		<div id="actualTimes" class="tabcontent">
+  		<h3>Actual Times</h3>
+		<p class="walkthrough">
+			<label>Actual Time for Walkthrough: <span id="actualWalkthroughTime">___</span> hours</label>
+		</p>
+		<p class="prepack">
+			<label>Actual Time for Pre-Pack: <span id="actualPrePackTime">___</span> hours</label>
+		</p>
+		<p class="pack">
+			<label>Actual Time for Pack: <span id="actualPackTime">___</span> hours</label>
+		</p>
+		<p class="morningmove">
+			<label>Actual Time for Morning Move: <span id="actualMorningMoveTime">___</span> hours</label>
+		</p>
+		<p  class="unpack">
+			<label>Actual Time for Unpack: <span id="actualUnpackTime">___</span> hours</label>
+		</p>
+		</div>
+
+		<div id="updater">
+		<button id= "walkthroughAccordion" class="walkthrough accordion">Walkthrough</button>
+		<div class="walkthrough panel">
+          	<p>
+          	<label>Hours for Walkthrough: </label>
+			<input type = "number" name = "updateWalkthrough" id = "updateWalkthrough" />
+			<button id="updateWalkthroughButton" type="submit" onclick="updateWalkthroughTime()"> Update</button>
+			</p>
+        </div>
+
+        <button id= "prepackAccordion" class="prepack accordion">Pre-Pack</button>
+		<div class="prepack panel">
+         	<p>
+         	<span id="highestPrePackArea"><label>Highest Hours for Pre-Pack:</label>
+			<input type = "number" name = "highestPrePack" id = "highestPrePack" />
+			<button id="updatePrePackTime" type="submit" onclick="updatePrePackTime()"> Update</button></span>
+			</p>
+			<p>
+        	<label>Number of People:</label>
+			<input type = "number" name = "numPrePackers" id = "actualNumPrePackers" /> 	
+          	<label>Hours for Pre-Pack:</label>
+			<input type = "number" name = "updatePrePack" id = "updatePrePack" />
+			<button id="updatePrePackButton" type="submit" onclick="updatePrePackCost()"> Update</button></p>
+        </div>
+
+        <button id= "packAccordion" class="pack accordion">Pack</button>
+		<div class="pack panel">
+			<p>
+         	<span id="highestPackArea"><label>Highest Hours for Pack:</label>
+			<input type = "number" name = "highestPack" id = "highestPack" />
+			<button id="updatePackTime" type="submit" onclick="updatePackTime()"> Update</button></span>
+			</p>
+			<p>
+        	<label>Number of People:</label>
+			<input type = "number" name = "numPackers" id = "actualNumPackers" />
+        	<label>Hours for Pack:</label>
+			<input type = "number" name = "updatePack" id = "updatePack" />
+			<button id="updatePackButton" type="submit" onclick="updatePackCost()"> Update</button>
+        	</p>
+        </div>
+
+        <button id= "morningmoveAccordion" class="morningmove accordion">Morning Move</button>
+		<div class="morningmove panel">
+			<p>
+          	<label>Hours for Morning Move: </label>
+			<input type = "number" name = "updateMorningMove" id = "updateMorningMove" />
+			<button id="updateMorningMoveButton" type="submit" onclick="updateMorningMoveTime()"> Update</button>
+			</p>
+        </div>
+
+        <button id= "unpackAccordion" class="unpack accordion">Unpack</button>
+		<div class="unpack panel">
+			<p>
+         	<span id="highestUnpackArea"><label>Highest Hours for Unpack:</label>
+			<input type = "number" name = "highestUnpack" id = "highestUnpack" />
+			<button id="updateUnpackTime" type="submit" onclick="updateUnpackTime()"> Update</button></span>
+			</p>
+        	<p>
+        	<label>Number of People:</label>
+			<input type = "number" name = "numUnpackers" id = "actualNumUnpackers" />
+        	<label>Hours for Unpack:</label>
+			<input type = "number" name = "updateUnpack" id = "updateUnpack" />
+			<button id="updateUnpackButton" type="submit" onclick="updateUnpackCost()"> Update</button>
+       		</p>
+       	</div>
+		
+
+		<div id="finalEstimate">
+		<p>
+			<label>Total Estimated Hours: <span id="estimatedTotalHours">0</span> hours</label>
+		</p>
+		<p>
+			<label>Total Hours: <span id="totalHours">0</span> hours</label>
+		</p>
+		<p>
+			<label>Estimated Cost: <strong>$</strong><span id="estimatedCost">0</span></label>
+		</p>
+		<p>
+			<label>Total Cost: <strong>$</strong><span id="totalCost">0</span></label>
+		</p>
+		<p>
+			<label>You were <strong id=finalCostDollarSign>$</strong><span id="finalCost">___ under/over </span> the Original Estimate</label>
+		</p>
+		</div>
+	</div>
+
+		<div id="footer">
+			<p>Project Manager Organizer by Joshua Loeffler is licensed under a <a rel="license" href="https://www.gnu.org/licenses/agpl-3.0.en.html">GNU Affero General Public License</a></p>
+		</div>
+
+		<script type="text/javascript" src="javascript/jquery-3.1.1.min.js"></script>
+ 
+		<script type="text/javascript">
+
+		$(document).ready(function() {
+			$('#estimate').hide();
+			$('#suggester').hide();
+			$('#actual').hide();
+			$('#updater').hide();
+			$('#finalEstimate').hide();
+    	$('#calculateButton').click(function() {
+       		$('#input').fadeOut('fast');
+			$('#estimate').fadeIn('fast');
+			$('#suggester').fadeIn('fast');
+			$('#actual').fadeIn('fast');
+			$('#updater').fadeIn('fast');
+			$('#finalEstimate').fadeIn('fast');
+			$('.options').fadeIn('fast');
+    		    });
+		});
+
+		var totalHours = 0;
+		var totalCost = 0;
+		var estimatedCost = 0;
+		var estimatedTotalHours = 0;
+		var hoursLostGained = 0;
+		isPrePack = true;
+
+
+		var acc = document.getElementsByClassName("accordion");
+		var i;
+
+		for (i = 0; i < acc.length; i++) {
+		  acc[i].onclick = function() {
+    		this.classList.toggle("active");
+    		var panel = this.nextElementSibling;
+    		if (panel.style.maxHeight){
+    		  panel.style.maxHeight = null;
+    		} else {
+    		  panel.style.maxHeight = panel.scrollHeight + 'px';
+    		} 
+  		}
+		}
+
+
+		// Get the modal
+		var modal1 = document.getElementById('calcHoursModal');
+		var modal2 = document.getElementById('modalHelp');
+		var modal3 = document.getElementById('modalContact');
+		// Get the button that opens the modal
+		var btn1 = document.getElementById("calcHoursMenuBtn");
+		var btn2 = document.getElementById("helpBtn");
+		var btn3 = document.getElementById("contactBtn");
+		// Get the <span> element that closes the modal
+		var span1 = document.getElementsByClassName("close")[0];
+		var span2 = document.getElementsByClassName("close")[1];
+		var span3 = document.getElementsByClassName("close")[2];
+		$('.menuItems').mouseenter(function() {
+			$(this).css("background-color", "#283891");
+			$(this).css("color", "white")
+		});
+
+		$('.menuItems').mouseleave(function() {
+			$(this).css("background-color", "white");
+			$(this).css("color", "#283891")
+		});
+		// When the user clicks on the button, open the modal 
+		btn1.onclick = function() {
+   	 	    modal1.style.display = "block";
+		}
+
+		btn2.onclick = function() {
+   	 	    modal2.style.display = "block";
+		}
+
+		btn3.onclick = function() {
+   	 	    modal3.style.display = "block";
+		}	
+		// When the user clicks on <span> (x), close the modal
+		span1.onclick = function() {
+   		    modal1.style.display = "none";
+		}
+
+		span2.onclick = function() {
+   		    modal2.style.display = "none";
+		}
+
+		span3.onclick = function() {
+   		    modal3.style.display = "none";
+		}
+		// When the user clicks anywhere outside of the modal, close it
+		window.onclick = function(event) {
+		    if (event.target == modal1) {
+		        modal1.style.display = "none";
+		    }
+		    if (event.target == modal2) {
+		        modal2.style.display = "none";
+		    }
+		    if (event.target == modal3) {
+		        modal3.style.display = "none";
+		    }
+		}
+
+		$('#refreshBtn').click(function() {
+			location.reload();
+		});
+
+		function navAdjust() {
+    		var x = document.getElementById("myTopnav");
+    		if (x.className === "topnav") {
+        		x.className += " responsive";
+    		} else {
+        		x.className = "topnav";
+    		}
+		}
+		
+		function openTimes(evt, timeName) {
+    		// Declare all variables
+    		var i, tabcontent, tablinks;
+
+    		// Get all elements with class="tabcontent" and hide them
+    		tabcontent = document.getElementsByClassName("tabcontent");
+    		for (i = 0; i < tabcontent.length; i++) {
+    		    tabcontent[i].style.display = "none";
+    		}
+
+    		// Get all elements with class="tablinks" and remove the class "active"
+    		tablinks = document.getElementsByClassName("tablinks");
+    		for (i = 0; i < tablinks.length; i++) {
+    		    tablinks[i].className = tablinks[i].className.replace(" active", "");
+    		}
+
+    		// Show the current tab, and add an "active" class to the link that opened the tab
+    		document.getElementById(timeName).style.display = "block";
+    		evt.currentTarget.className += " active";
+		}
+
+
+		function calculateHours() {
+			var calcHours = parseInt(document.getElementById("calcHours").value);
+			var calcMinutes = parseInt(document.getElementById("calcMinutes").value);
+			if (calcMinutes > 60 || calcMinutes < 0){
+				alert("Minutes cannot be greater than 60 or less than 0!");
+				return;
+			}
+			else if (isNaN(calcHours) || isNaN(calcMinutes)){
+				alert("Please enter a value into every field!");
+			}
+			document.getElementById("convertedHours").innerHTML = Math.round(100*(calcHours+(calcMinutes/60)))/100 + " hours";
+			document.getElementById("calcHours").value=0;
+			document.getElementById("calcMinutes").value=0;
+		}
+
+		function calculateTimes() {
+		var numPrePackers = document.getElementById("numPrePackers").value;
+		var numUnpackers = document.getElementById("numUnpackers").value;
+		var numPackers = document.getElementById("numPackers").value;
+
+    	var estWalkthrough = parseFloat(document.getElementById("estWalkthrough").value);
+		var estPrePack = parseFloat(document.getElementById("estPrePack").value);
+		var estPack = parseFloat(document.getElementById("estPack").value);
+		var estMorningMove = parseFloat(document.getElementById("estMorningMove").value);
+		var estUnpack = parseFloat(document.getElementById("estUnpack").value);
+
+		window.hourlyRate = parseInt(document.getElementById("rate").value);
+
+		if (isNaN(estWalkthrough)){
+			estWalkthrough = 0;
+			var timeWalkthrough = 0;
+			$('.walkthrough').hide();
+		} else {
+			var timeWalkthrough = Math.round(100*(estWalkthrough/hourlyRate))/100;
+			estimatedTotalHours+=timeWalkthrough;
+		}
+		document.getElementById("timeWalkthrough").innerHTML = timeWalkthrough;
+		
+		if (isNaN(estPrePack)){
+			estPrePack = 0;
+			var timePrePack = 0;
+			isPrePack = false;
+			$('.prepack').hide();
+		} else {
+		var timePrePack = Math.round(100*((estPrePack/hourlyRate)/numPrePackers))/100;
+		estimatedTotalHours+=timePrePack*numPrePackers;
+		}
+		document.getElementById("timePrePack").innerHTML = timePrePack;
+
+		if (isNaN(estPack)){
+			estPack = 0;
+			var timePack = 0;
+			$('.pack').hide();
+		} else {
+		var timePack = Math.round(100*((estPack/hourlyRate)/numPackers))/100;
+		estimatedTotalHours+=timePack*numPackers;	 
+		}
+		document.getElementById("timePack").innerHTML = timePack;
+
+		if (isNaN(estMorningMove)){
+			estMorningMove = 0;
+			var timeMorningMove = 0;
+			$('.morningmove').hide();
+		} else {
+		var timeMorningMove = Math.round(100*(estMorningMove/hourlyRate))/100;
+		estimatedTotalHours+=timeMorningMove;
+		}
+		document.getElementById("timeMorningMove").innerHTML = timeMorningMove;
+
+		if (isNaN(estUnpack)){
+			estUnpack = 0;
+			var timeUnpack = 0;
+			$('.unpack').hide();
+		} else {
+		var timeUnpack = Math.round(100*((estUnpack/hourlyRate)/numUnpackers))/100;
+		estimatedTotalHours+=timeUnpack*numUnpackers;
+		}
+		document.getElementById("timeUnpack").innerHTML = timeUnpack;
+		estimatedCost = estWalkthrough + estPrePack + estPack + estMorningMove + estUnpack;
+		document.getElementById("estimatedCost").innerHTML = estimatedCost;
+		document.getElementById("estimatedTotalHours").innerHTML = estimatedTotalHours;
+		document.getElementById("estimatedTimesTab").click();	
+		}
+
+		function updateWalkthroughTime() {
+    	var timeWalkthrough = parseFloat(document.getElementById("timeWalkthrough").innerHTML);
+		var timePrePack = parseFloat(document.getElementById("timePrePack").innerHTML);
+		var timePack = parseFloat(document.getElementById("timePack").innerHTML);
+		var updateWalkthrough = parseFloat($("input[name='updateWalkthrough']").val());
+		totalHours += updateWalkthrough;
+		totalCost += updateWalkthrough*hourlyRate;
+		if (isPrePack == true){		
+			if (updateWalkthrough > timeWalkthrough) {
+				document.getElementById("suggestPrePackTime").innerHTML = timePrePack - (updateWalkthrough-timeWalkthrough);
+				document.getElementById("actualWalkthroughTime").style.color = "red";}
+			else {
+				document.getElementById("suggestPrePackTime").innerHTML = timePrePack + (timeWalkthrough-updateWalkthrough);
+				document.getElementById("actualWalkthroughTime").style.color = "green";}
+		}else {
+			if (updateWalkthrough > timeWalkthrough) {
+				document.getElementById("suggestPackTime").innerHTML = timePack - (updateWalkthrough-timeWalkthrough);
+				document.getElementById("actualWalkthroughTime").style.color = "red";}
+			else {
+				document.getElementById("suggestPackTime").innerHTML = timePack + (timeWalkthrough-updateWalkthrough);
+				document.getElementById("actualWalkthroughTime").style.color = "green";}}
+		document.getElementById("actualWalkthroughTime").innerHTML = updateWalkthrough;
+		document.getElementById("totalHours").innerHTML = totalHours;
+		document.getElementById("totalCost").innerHTML = totalCost;
+		document.getElementById("updateWalkthrough").value = "";
+		document.getElementById("walkthroughAccordion").style.color = "#00cc00";
+		}
+
+		function updatePrePackTime() {
+		if (document.getElementById("suggestPrePackTime").innerHTML == "___"){
+			alert("Please fill out the number of hours for the walkthrough first!");
+			return;
+		}
+		var timePack = parseFloat(document.getElementById("timePack").innerHTML);
+		var suggestPrePack = parseFloat(document.getElementById("suggestPrePackTime").innerHTML);
+		var highestPrePack = parseFloat($("input[name='highestPrePack']").val());		
+		if (highestPrePack > suggestPrePack) {
+			document.getElementById("suggestPackTime").innerHTML = timePack - (highestPrePack-suggestPrePack);
+			document.getElementById("actualPrePackTime").style.color = "red";}
+		else {
+			document.getElementById("suggestPackTime").innerHTML = timePack + (suggestPrePack-highestPrePack);
+			document.getElementById("actualPrePackTime").style.color = "green";}
+		document.getElementById("actualPrePackTime").innerHTML = highestPrePack;
+		$('#highestPrePackArea').hide();
+		}
+
+		function updatePrePackCost() {
+		var updatePrePack = parseFloat($("input[name='updatePrePack']").val());
+		var numPrePackers = parseInt($("input[name='numPrePackers']").val());
+		totalHours += updatePrePack*numPrePackers;
+		totalCost += updatePrePack*numPrePackers*hourlyRate;
+		document.getElementById("totalHours").innerHTML = totalHours;
+		document.getElementById("totalCost").innerHTML = totalCost;
+		document.getElementById("updatePrePack").value = "";
+		document.getElementById("actualNumPrePackers").value = "";
+		document.getElementById("prepackAccordion").style.color = "#00cc00";
+		}
+
+		function updatePackTime() {
+		if (document.getElementById("suggestPackTime").innerHTML == "___"){
+			alert("Please fill out the number of hours for the pre-pack first!");
+			return;
+		}
+    	var suggestPack = parseFloat(document.getElementById("suggestPackTime").innerHTML);
+		var timeMorningMove = parseFloat(document.getElementById("timeMorningMove").innerHTML);
+		var highestPack = parseFloat($("input[name='highestPack']").val());		
+		if (highestPack > suggestPack) {
+			document.getElementById("suggestMorningMoveTime").innerHTML = timeMorningMove - (highestPack-suggestPack);
+			document.getElementById("actualPackTime").style.color = "red";}
+		else {
+			document.getElementById("suggestMorningMoveTime").innerHTML = timeMorningMove + (suggestPack-highestPack);
+			document.getElementById("actualPackTime").style.color = "green";}
+		document.getElementById("actualPackTime").innerHTML = highestPack;
+		$('#highestPackArea').hide();
+		}
+
+		function updatePackCost() {
+		var updatePack = parseFloat($("input[name='updatePack']").val());
+		var numPackers = parseInt($("input[name='numPackers']").val());
+		totalHours += updatePack*numPackers;
+		totalCost += updatePack*numPackers*hourlyRate;
+		document.getElementById("totalCost").innerHTML = totalCost;
+		document.getElementById("totalHours").innerHTML = totalHours;
+		document.getElementById("updatePack").value = "";
+		document.getElementById("actualNumPackers").value = "";
+		document.getElementById("packAccordion").style.color = "#00cc00";
+		}
+
+		function updateMorningMoveTime() {
+		if (document.getElementById("suggestMorningMoveTime").innerHTML == "___"){
+			alert("Please fill out the number of hours for the pack first!");
+			return;
+		}
+    	var suggestMorningMove = parseFloat(document.getElementById("suggestMorningMoveTime").innerHTML);
+		var timeUnpack = parseFloat(document.getElementById("timeUnpack").innerHTML);
+		var updateMorningMove = parseFloat($("input[name='updateMorningMove']").val());
+		totalHours += updateMorningMove;
+		totalCost += updateMorningMove*hourlyRate;
+		
+		if (updateMorningMove > suggestMorningMove) {
+			document.getElementById("suggestUnpackTime").innerHTML = timeUnpack - (updateMorningMove-suggestMorningMove);
+			document.getElementById("actualMorningMoveTime").style.color = "red";}
+		else {
+			document.getElementById("suggestUnpackTime").innerHTML = timeUnpack + (suggestMorningMove-updateMorningMove);
+			document.getElementById("actualMorningMoveTime").style.color = "green";}
+		document.getElementById("actualMorningMoveTime").innerHTML = updateMorningMove;
+		document.getElementById("totalHours").innerHTML = totalHours;
+		document.getElementById("totalCost").innerHTML = totalCost;
+		document.getElementById("updateMorningMove").value = "";
+		document.getElementById("morningmoveAccordion").style.color = "#00cc00";
+		}
+
+		function updateUnpackTime() {
+		if (document.getElementById("suggestUnpackTime").innerHTML == "___"){
+			alert("Please fill out the number of hours for the walkthrough first!");
+			return;
+		}
+    	var timeUnpack = parseFloat(document.getElementById("timeUnpack").innerHTML);
+		var highestUnpack = parseFloat($("input[name='highestUnpack']").val());		
+		if (highestUnpack > timeUnpack) {
+			document.getElementById("actualUnpackTime").style.color = "red";}
+		else {
+			document.getElementById("actualUnpackTime").style.color = "green";}
+		document.getElementById("actualUnpackTime").innerHTML = highestUnpack;
+		$('#highestUnpackArea').hide();
+		}
+
+		function updateUnpackCost() {
+		var updateUnpack = parseFloat($("input[name='updateUnpack']").val());
+		var numUnpackers = parseFloat($("input[name='numUnpackers']").val());
+		totalHours += updateUnpack*numUnpackers;
+		totalCost += updateUnpack*numUnpackers*hourlyRate;
+		document.getElementById("totalHours").innerHTML = totalHours;
+		document.getElementById("totalCost").innerHTML = totalCost;
+		if (totalCost > estimatedCost) {
+			document.getElementById("finalCost").innerHTML = (totalCost - estimatedCost) + " over";
+			document.getElementById("finalCost").style.color = "red";}
+		else if (totalCost < estimatedCost){
+			document.getElementById("finalCost").innerHTML = (estimatedCost - totalCost) + " under";
+			document.getElementById("finalCost").style.color = "green";}
+		else {
+			document.getElementById("finalCost").innerHTML = "spot on";
+			document.getElementById("finalCostDollarSign").innerHTML = "";
+			document.getElementById("finalCost").style.color = "green";}
+		document.getElementById("updateUnpack").value = "";
+		document.getElementById("actualNumUnpackers").value = "";
+		document.getElementById("unpackAccordion").style.color = "#00cc00";
+		}
+		</script>
+		</div>
+	</body>
+</html>
